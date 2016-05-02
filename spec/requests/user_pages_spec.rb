@@ -4,8 +4,9 @@ describe 'UserPages' do
   subject { page }
 
   describe 'index' do
+    let(:user) { create :user }
     before do
-      sign_in create(:user)
+      sign_in user
       create(:user, name: 'Bob', email: 'bob@example.com')
       create(:user, name: 'Ben', email: 'ben@example.com')
       visit users_path
@@ -28,6 +29,25 @@ describe 'UserPages' do
       it 'should list each user' do
         User.paginate(page: 1).each do |user|
           expect(page).to have_selector('li', text: user.name)
+        end
+      end
+    end
+
+    describe 'delete links' do
+      it { should_not have_link 'delete' }
+
+      describe 'as an admin user' do
+        let(:admin) { create :admin }
+        before do
+          sign_in admin
+          visit users_path
+        end
+
+        it { should have_link('delete', href: user_path(User.first)) }
+        it 'should be able to delete another user' do
+          expect do
+            click_link('delete', match: :first)
+          end.to change(User, :count).by(-1)
         end
       end
     end

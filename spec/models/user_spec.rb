@@ -1,21 +1,33 @@
 require 'spec_helper'
 
 describe User do
-  let(:user) { User.new(name: 'Example User',
-                        email: 'example@example.com',
-                        password: 'foobar',
-                        password_confirmation: 'foobar') }
+  let(:user) do
+    User.new(name: 'Example User',
+             email: 'example@example.com',
+             password: 'foobar',
+             password_confirmation: 'foobar')
+  end
 
   subject { user }
 
   it { should respond_to :name }
   it { should respond_to :email }
   it { should respond_to :password_digest }
-  it { should respond_to :password}
+  it { should respond_to :password }
   it { should respond_to :password_confirmation }
   it { should respond_to :remember_token }
   it { should respond_to :authenticate }
+  it { should respond_to :admin }
   it { should be_valid }
+
+  describe 'with admin attribute set to "true"' do
+    before do
+      user.save!
+      user.toggle! :admin
+    end
+
+    it { should be_admin }
+  end
 
   describe 'when name is not present' do
     before { user.name = '' }
@@ -64,11 +76,8 @@ describe User do
   end
 
   describe 'when password is not present' do
-    before do
-      user = User.new(name: 'Example User', email: 'user@example.com',
-                      password: ' ', password_confirmation: ' ')
-      it { should_not be_valid }
-    end
+    let(:user_d) { build(:user, password: ' ') }
+    specify { expect(user_d).not_to be_valid }
   end
 
   describe 'when password doesn\'t match confirmation' do
