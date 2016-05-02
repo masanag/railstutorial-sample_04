@@ -19,6 +19,18 @@ describe 'UserPages' do
         expect(page).to have_selector('li', text: user.name)
       end
     end
+
+    describe 'pagination' do
+      before(:all) { 30.times { create :user } }
+      after(:all) { User.delete_all }
+
+      it { should have_selector 'div.pagination' }
+      it 'should list each user' do
+        User.paginate(page: 1).each do |user|
+          expect(page).to have_selector('li', text: user.name)
+        end
+      end
+    end
   end
 
   describe 'signup page' do
