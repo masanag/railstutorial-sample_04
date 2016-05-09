@@ -1,0 +1,10 @@
+- @user ||= current_user
+.stats
+  = link_to following_user_path(@user) do
+    = content_tag :strong, id: :following, class: :stat do
+      = @user.followed_users.count
+    |  following
+  = link_to followers_user_path(@user) do
+    = content_tag :strong, id: :followers, class: :stat do
+      = @user.followers.count
+    |  followers
